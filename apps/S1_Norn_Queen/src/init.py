@@ -1,11 +1,14 @@
 import glob
 import os
 import pathlib
+from pathlib import Path
 import platform
 import subprocess
 import sys
+os.environ.setdefault("OPENCV_LOG_LEVEL", "ERROR")  # hide probe warnings for missing cameras
 import cv2
 
+NAME = "Norn Queen"
 
 files = []
 selected_model = ""
@@ -35,9 +38,9 @@ def list_files_in_directory(directory: str | pathlib.Path):
 
 def list_models():
     clear()
-    current_directory = pathlib.Path(__file__).parent.parent.parent / "assets" / "models"
-    print(f"Available models ({current_directory}):")
-    list_files_in_directory(current_directory)
+    MODELS_DIR = Path("C:/Users/ADI/Documents/GitHub/cyberhive/assets/models")
+    print(f"Available models ({MODELS_DIR}):")
+    list_files_in_directory(MODELS_DIR)
     print()
 
 
@@ -116,17 +119,18 @@ def select_camera_id():
             print("\nInvalid input. Please enter a number.")
 
 
-def start_server():
-    path = pathlib.Path(__file__).parent.parent.parent / "src" / "server" / "recognizer.py"
-    command = [sys.executable, str(path), "--model", str(selected_model), "--camera-id", str(selected_camera_id)]
+def start_server(model, camera_id):
+    path = pathlib.Path(__file__).parent / "recognizer.py"
+    command = [sys.executable, str(path), "--model", str(model), "--camera-id", str(camera_id)]
     subprocess.run(command, check=False)
 
 
-if __name__ == "__main__":
+def init_server():
     list_models()
 
     if len(files) == 0:
         no_models()
+        exit(1)
 
     selected_model = select_model()
 
@@ -148,5 +152,5 @@ if __name__ == "__main__":
 
     print(f"Selected camera ID: {selected_camera_id}\n")
 
-    start_server()
+    start_server(selected_model, selected_camera_id)
 

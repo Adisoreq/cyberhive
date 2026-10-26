@@ -1,6 +1,15 @@
 # Server setup
 
-## Variations
+## Installing dependencies
+
+From main repository catalogue, execute command:
+
+```cmd
+python -m venv .venv
+```
+
+
+## App setup
 
 ### 1. Windows PC
 

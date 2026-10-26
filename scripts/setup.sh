@@ -82,8 +82,8 @@ if ! $SKIP_INSTALL; then
     info "Aktualizacja pip..."
     "$PYTHON" -m pip install --upgrade pip
 
-    info "Instalacja zaleznosci produkcyjnych (requirements-prod.txt)..."
-    "$PIP" install -r "$PROJECT_ROOT/requirements-prod.txt"
+    info "Instalacja zaleznosci produkcyjnych (requirements.txt)..."
+    "$PIP" install -r "$PROJECT_ROOT/requirements.txt"
 
     success "Zaleznosci zainstalowane pomyslnie."
 else

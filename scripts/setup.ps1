@@ -72,8 +72,8 @@ if (-not $SkipInstall) {
     & $PyExe -m pip install --upgrade pip
     if ($LASTEXITCODE -ne 0) { Write-Error "Nie udalo sie zaktualizowac pip." }
 
-    Write-Host "Instalacja zaleznosci deweloperskich (requirements-dev.txt)..." -ForegroundColor Cyan
-    & $PipExe install -r (Join-Path $ProjectRoot 'requirements-dev.txt')
+    Write-Host "Instalacja zaleznosci deweloperskich (requirements.txt)..." -ForegroundColor Cyan
+    & $PipExe install -r (Join-Path $ProjectRoot 'requirements.txt')
     if ($LASTEXITCODE -ne 0) { Write-Error "Instalacja zaleznosci nie powiodla sie." }
 
     Write-Host "Zaleznosci zainstalowane pomyslnie." -ForegroundColor Green

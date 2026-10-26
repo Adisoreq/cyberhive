@@ -42,9 +42,10 @@ HAND_CONNECTIONS: List[Tuple[int, int]] = [
     (0, 17),
 ]
 
+MODELS_DIR = Path("C:/Users/ADI/Documents/GitHub/cyberhive/assets/models")
 
 def parse_args() -> argparse.Namespace:
-    default_model = Path(__file__).resolve().parent.parent.parent / "assets" / "models" / "model" / "gesture_recognizer.task"
+    default_model = MODELS_DIR / "model" / "gesture_recognizer.task"
     parser = argparse.ArgumentParser(
         description="Hand pose and gesture recognition from camera image (MediaPipe Tasks)."
     )

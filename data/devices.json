@@ -1,0 +1,78 @@
+[
+    {
+        "project": {
+            "id": "C1_Termagant_A",
+            "name": "Termagant A",
+            "prefix": "C1",
+            "role": "client"
+        },
+        "device": {
+            "controller": "Seeed XIAO nRF52840 Sense",
+            "manufacturer": "Seeed Studio",
+            "processor": "Nordic nRF52840",
+            "network": "Bluetooth Low Energy 5.4/Bluetooth Mesh/NFC",
+            "memory": "256 KB RAM, 1 MB Flash"
+        },
+        "network": {
+            "type": "BLE",
+            "addresses": {
+                "BLE": "5D:9D:7D:D4:06:6F"
+            },
+            "device_name": "Termagant A",
+            "services": [
+                {
+                    "uuid": "6cced000-f280-4439-b11e-4f40ae081441",
+                    "characteristics": [
+                        {
+                            "uuid": "6cced001-f280-4439-b11e-4f40ae081441",
+                            "handle": "0x000B",
+                            "properties": [ "write", "write-without-response" ],
+                            "description": "Channel for steering the robot. ",
+                            "input": {
+                                "description": "First byte indicates action (0x00 - stop, 0x01 - forward, 0x02 - backward, 0x03 - subsequent actions). Second byte indicates motor PWM (0 - 255).",
+                                "format": "array<uint8>[2]"
+                            },
+                            "output": "none"
+                        },
+                        {
+                            "uuid": "6cced002-f280-4439-b11e-4f40ae081441",
+                            "handle": "0x000C",
+                            "properties": [ "read", "notify" ],
+                            "description": "Channel for reading the robot's status.",
+                            "input": "none",
+                            "output": {
+                                "description": "Status of the robot.",
+                                "format": "array<uint8>[2]"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "project": {
+            "id": "S1_Norn_Queen",
+            "name": "Norn Queen",
+            "prefix": "S1",
+            "role": "server"
+        },
+        "device": {
+            "controller": "Dragon Q6A",
+            "manufacturer": "Radxa",
+            "processor": "Rockchip RK3568",
+            "network": "Ethernet/Wi-Fi/Bluetooth",
+            "memory": "4 GB RAM, 16 GB Flash",
+            "storage": "32GB SD card",
+            "OS": "Linux (Ubuntu)"
+        },
+        "network": {
+            "type": "Wi-Fi/Bluetooth",
+            "addresses": {
+                "WiFi": "auto",
+                "mDNS": "radxa.local"
+            },
+            "device_name": "Norn Queen"
+        }
+    }
+]
