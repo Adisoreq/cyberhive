@@ -6,7 +6,13 @@
 #include "Motors.h"
 #include "Pins.h"
 
-enum Mode : uint8_t { MODE_STOP = 0, MODE_FWD = 1, MODE_BWD = 2, MODE_AUTO = 3 };
+enum Mode : uint8_t { MODE_STOP = 0, 
+    MODE_FWD = 1, 
+    MODE_BWD = 2,
+    MODE_LEFT = 3,
+    MODE_RIGHT = 4,
+    MODE_AUTO = 5
+ };
 
 Mode    mode  = MODE_STOP;
 uint8_t speed = 200;
@@ -34,6 +40,12 @@ namespace Commands {
         else if (m == MODE_BWD) {
             applyMotion(false);
         }
+        else if (m == MODE_LEFT) {
+            applyMotion(true);
+        }
+        else if (m == MODE_RIGHT) {
+            applyMotion(true);
+        }
         if (onStatusChanged) onStatusChanged();
     }
 
@@ -51,7 +63,9 @@ namespace Commands {
             case 0: setMode(MODE_STOP); break;
             case 1: setMode(MODE_FWD);  break;
             case 2: setMode(MODE_BWD);  break;
-            case 3: setMode(MODE_AUTO); break;
+            case 3: setMode(MODE_LEFT); break;
+            case 4: setMode(MODE_RIGHT); break;
+            case 5: setMode(MODE_AUTO); break;
             default: Serial.println("Nieznana komenda"); break;
         }
     }
