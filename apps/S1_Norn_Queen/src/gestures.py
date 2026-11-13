@@ -37,6 +37,38 @@ GESTURE_COMMANDS = {
 }
 
 
+STABLE_FRAMES = 4  # tyle kolejnych klatek z tym samym poleceniem zanim zostanie wysłane
+
+
 def build_frame(command: int, speed: int) -> bytes:
     """Ramka: [0] = komenda (tryb), [1] = prędkość 0-255."""
     return bytes([command & 0xFF, max(0, min(255, speed))])
+
+
+class CommandTracker:
+    """Zamienia strumień gestów na polecenie aktywne dopiero po STABLE_FRAMES identycznych klatkach."""
+
+    def __init__(self, stable_frames: int = STABLE_FRAMES) -> None:
+        self.stable_frames = stable_frames
+        self.reset()
+
+    def reset(self) -> None:
+        self._candidate: int | None = None
+        self._count = 0
+        self.active: int | None = None
+
+    def update(self, gesture: str | None, hands: int, stop_when_lost: bool = True) -> int | None:
+        cmd = GESTURE_COMMANDS.get(gesture) if gesture else None
+        if cmd is None and hands == 0 and stop_when_lost:
+            cmd = CMD_STOP
+
+        if cmd is not None:
+            if cmd == self._candidate:
+                self._count += 1
+            else:
+                self._candidate, self._count = cmd, 1
+            if self._count >= self.stable_frames:
+                self.active = cmd
+        else:
+            self._candidate, self._count = None, 0
+        return self.active

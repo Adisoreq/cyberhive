@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import json
 from datetime import datetime
-from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QCloseEvent, QColor, QImage, QPixmap
@@ -41,13 +39,8 @@ from ble_manager import (
     BleManager,
 )
 from camera_worker import CameraScanner, CameraWorker
-from gestures import CMD_STOP, COMMAND_NAMES, GESTURE_COMMANDS, build_frame
-
-APP_DIR = Path(__file__).resolve().parent.parent
-DEVICES_FILE = APP_DIR / "config" / "devices.json"
-MODELS_DIR = APP_DIR.parent.parent / "assets" / "models"
-
-STABLE_FRAMES = 4  # tyle kolejnych klatek z tym samym poleceniem zanim zostanie wysłane
+from common import DEVICES_FILE, MODELS_DIR, char_uuid, find_models, load_devices
+from gestures import CMD_STOP, COMMAND_NAMES, CommandTracker, build_frame
 
 STATE_TEXT = {
     STATE_DISCONNECTED: "Rozłączono",
@@ -67,18 +60,6 @@ STATE_COLOR = {
 COL_NAME, COL_ADDR, COL_STATE, COL_STATUS, COL_ACTION = range(5)
 
 
-def load_devices() -> list[dict]:
-    with open(DEVICES_FILE, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def char_uuid(device: dict, kind: str) -> str | None:
-    for ch in device.get("chars", []):
-        if ch.get("type") == kind:
-            return ch.get("uuid")
-    return None
-
-
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -93,9 +74,7 @@ class MainWindow(QMainWindow):
         self.states: dict[str, str] = {}
         self.cameras: list[tuple[object, str]] = []
 
-        self._candidate: int | None = None
-        self._candidate_count = 0
-        self._active_cmd: int | None = None
+        self.tracker = CommandTracker()
         self._last_sent: tuple[int, int] | None = None
 
         self._build_ui()
@@ -281,7 +260,7 @@ class MainWindow(QMainWindow):
             self._render_state(addr, STATE_DISCONNECTED, "")
 
     def _load_models(self) -> None:
-        models = sorted(MODELS_DIR.rglob("*.task")) if MODELS_DIR.exists() else []
+        models = find_models()
         for path in models:
             self.combo_model.addItem(str(path.relative_to(MODELS_DIR)), path)
         if not models:
@@ -457,30 +436,15 @@ class MainWindow(QMainWindow):
         self._update_command(s)
 
     def _reset_gesture_state(self) -> None:
-        self._candidate = None
-        self._candidate_count = 0
-        self._active_cmd = None
+        self.tracker.reset()
         self._last_sent = None
 
     def _update_command(self, s: dict) -> None:
-        cmd = GESTURE_COMMANDS.get(s["gesture"]) if s["gesture"] else None
-        if cmd is None and s["hands"] == 0 and self.chk_stop_lost.isChecked():
-            cmd = CMD_STOP
-
-        if cmd is not None:
-            if cmd == self._candidate:
-                self._candidate_count += 1
-            else:
-                self._candidate, self._candidate_count = cmd, 1
-            if self._candidate_count >= STABLE_FRAMES:
-                self._active_cmd = cmd
-        else:
-            self._candidate, self._candidate_count = None, 0
-
-        if self._active_cmd is not None:
-            self.lbl_command.setText(COMMAND_NAMES[self._active_cmd])
+        active = self.tracker.update(s["gesture"], s["hands"], self.chk_stop_lost.isChecked())
+        if active is not None:
+            self.lbl_command.setText(COMMAND_NAMES[active])
             if self.chk_send.isChecked():
-                self._send(self._active_cmd)
+                self._send(active)
 
     def _send(self, cmd: int) -> None:
         speed = self.slider_speed.value()

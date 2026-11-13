@@ -1,0 +1,1 @@
+cd /home/radxa/Documents/GitHub/RemoteDroids/apps/S1_Norn_Queen && .venv/bin/python src/main.py --cli
