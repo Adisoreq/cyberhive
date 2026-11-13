@@ -1,0 +1,16 @@
+[
+    {
+        "name": "Termagant A",
+        "address": "5D:9D:7D:D4:06:6F",
+        "chars": [
+            {
+                "uuid": "6cced001-f280-4439-b11e-4f40ae081441",
+                "type": "write"
+            },
+            {
+                "uuid": "6cced002-f280-4439-b11e-4f40ae081441",
+                "type": "read"
+            }
+        ]
+    }
+]

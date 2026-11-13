@@ -6,33 +6,35 @@
 #include "Motors.h"
 #include "Pins.h"
 
-enum Mode : uint8_t { MODE_STOP = 0, MODE_FWD = 1, MODE_BWD = 2, MODE_AUTO = 3 };
+enum Mode : uint8_t { MODE_STOP = 0, MODE_FWD = 1, MODE_BWD = 2, MODE_LEFT = 3, MODE_RIGHT = 4, MODE_AUTO = 5 };
 
 Mode    mode  = MODE_STOP;
 uint8_t speed = 200;
 
 namespace Commands {
-
-    // Wywoływany po zmianie trybu/prędkości (ustawiany przez warstwę transportu, np. Bluetooth)
     void (*onStatusChanged)() = nullptr;
 
-    void applyMotion(bool forward) {
-        digitalWrite(PIN_BLUE, forward ? LOW : HIGH);
+    void applyMotion(Mode m) {
+        bool forward = (m == MODE_FWD);
+        digitalWrite(LED_BLUE, forward ? LOW : HIGH);
+        
         if (forward) Motors::moveFwd(speed);
-        else         Motors::moveBwd(speed);
+        else if (m == MODE_BWD) Motors::moveBwd(speed);
+        else if (m == MODE_LEFT) Motors::turnLeft(speed);
+        else if (m == MODE_RIGHT) Motors::turnRight(speed);
     }
 
     void setMode(Mode m) {
         mode = m;
         if (m == MODE_STOP) {
             Motors::stop();
-            digitalWrite(PIN_BLUE, HIGH);
+            digitalWrite(LED_BLUE, HIGH);
         } 
         else if (m == MODE_FWD) {
-            applyMotion(true);
+            applyMotion(MODE_FWD);
         } 
         else if (m == MODE_BWD) {
-            applyMotion(false);
+            applyMotion(MODE_BWD);
         }
         if (onStatusChanged) onStatusChanged();
     }
@@ -51,7 +53,9 @@ namespace Commands {
             case 0: setMode(MODE_STOP); break;
             case 1: setMode(MODE_FWD);  break;
             case 2: setMode(MODE_BWD);  break;
-            case 3: setMode(MODE_AUTO); break;
+            case 3: setMode(MODE_LEFT); break;
+            case 4: setMode(MODE_RIGHT); break;
+            case 5: setMode(MODE_AUTO); break;
             default: Serial.println("Nieznana komenda"); break;
         }
     }

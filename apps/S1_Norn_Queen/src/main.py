@@ -1,4 +1,16 @@
-from init import init_server
+import sys
+
+from PySide6.QtWidgets import QApplication
+
+from main_window import MainWindow
+
+
+def main() -> int:
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    return app.exec()
+
 
 if __name__ == "__main__":
-    init_server()
+    sys.exit(main())
