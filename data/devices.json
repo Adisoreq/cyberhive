@@ -29,7 +29,7 @@
                             "properties": [ "write", "write-without-response" ],
                             "description": "Channel for steering the robot. ",
                             "input": {
-                                "description": "First byte indicates action (0x00 - stop, 0x01 - forward, 0x02 - backward, 0x03 - subsequent actions). Second byte indicates motor PWM (0 - 255).",
+                                "description": "Byte 0 selects motion: 0x00 stop, 0x01 forward, 0x02 backward, 0x03 turn left, 0x04 turn right, 0x05 automatic forward/backward. Byte 1 is motor PWM speed (0-255).",
                                 "format": "array<uint8>[2]"
                             },
                             "output": "none"

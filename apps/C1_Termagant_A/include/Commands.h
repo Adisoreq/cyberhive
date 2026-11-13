@@ -17,25 +17,19 @@ namespace Commands {
     void applyMotion(Mode m) {
         bool forward = (m == MODE_FWD);
         digitalWrite(LED_BLUE, forward ? LOW : HIGH);
-        
-        if (forward) Motors::moveFwd(speed);
-        else if (m == MODE_BWD) Motors::moveBwd(speed);
-        else if (m == MODE_LEFT) Motors::turnLeft(speed);
-        else if (m == MODE_RIGHT) Motors::turnRight(speed);
+
+        switch (m) {
+            case MODE_FWD:   Motors::moveFwd(speed); break;
+            case MODE_BWD:   Motors::moveBwd(speed); break;
+            case MODE_LEFT:  Motors::turnLeft(speed); break;
+            case MODE_RIGHT: Motors::turnRight(speed); break;
+            default:         Motors::stop(); break;
+        }
     }
 
     void setMode(Mode m) {
         mode = m;
-        if (m == MODE_STOP) {
-            Motors::stop();
-            digitalWrite(LED_BLUE, HIGH);
-        } 
-        else if (m == MODE_FWD) {
-            applyMotion(MODE_FWD);
-        } 
-        else if (m == MODE_BWD) {
-            applyMotion(MODE_BWD);
-        }
+        applyMotion(m);
         if (onStatusChanged) onStatusChanged();
     }
 
@@ -43,11 +37,16 @@ namespace Commands {
     void process(const uint8_t* buf, int len) {
         if (len < 1) return;
 
-        if (len >= 2) speed = buf[1];
-
         Serial.print("CMD: ");
         for (int i = 0; i < len; i++) { Serial.print(buf[i], HEX); Serial.print(' '); }
         Serial.println();
+
+        if (buf[0] > MODE_AUTO) {
+            Serial.println("Nieznana komenda");
+            return;
+        }
+
+        if (len >= 2) speed = buf[1];
 
         switch (buf[0]) {
             case 0: setMode(MODE_STOP); break;
@@ -56,7 +55,6 @@ namespace Commands {
             case 3: setMode(MODE_LEFT); break;
             case 4: setMode(MODE_RIGHT); break;
             case 5: setMode(MODE_AUTO); break;
-            default: Serial.println("Nieznana komenda"); break;
         }
     }
 }

@@ -19,13 +19,21 @@ COMMAND_NAMES = {
 }
 
 GESTURE_COMMANDS = {
+    # Piesc
     "Closed_Fist": CMD_STOP,
-    "Open_Palm": CMD_STOP,
-    "Pointing_Up": CMD_FWD,
+
+    # Otwarta dłoń / piatka
+    "Open_Palm": CMD_AUTO,
+
+    # Kciuk w górę / w dół
+    "Thumb_Up": CMD_FWD,
     "Thumb_Down": CMD_BWD,
-    "Victory": CMD_LEFT,
-    "ILoveYou": CMD_RIGHT,
-    "Thumb_Up": CMD_AUTO,
+
+    # Wskazujący w górę
+    "Pointing_Up": CMD_LEFT,
+
+    # 2 wskazujące
+    "Victory": CMD_RIGHT,
 }
 
 
